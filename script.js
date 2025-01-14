@@ -5,9 +5,15 @@ const penColorPicker = document.querySelector("#pen-color");
 slider.value = 16;
 penColorPicker.value = "#000000"; // Reset color picker to black
 
-const gridWidth = getComputedStyle(document.body).getPropertyValue("--grid-width");
-const accentColor = getComputedStyle(document.body).getPropertyValue("--accent-color");
-const inactiveColor = getComputedStyle(document.body).getPropertyValue("--inactive-color");
+const gridWidth = getComputedStyle(document.body).getPropertyValue(
+  "--grid-width"
+);
+const accentColor = getComputedStyle(document.body).getPropertyValue(
+  "--accent-color"
+);
+const inactiveColor = getComputedStyle(document.body).getPropertyValue(
+  "--inactive-color"
+);
 
 const sketchPad = document.querySelector("#sketchpad");
 const gridToggle = document.querySelector("#grid-toggle");
@@ -27,6 +33,17 @@ let shadeVisible = false;
 let penColor = penColorPicker.value;
 penColorPicker.addEventListener("input", (e) => {
   penColor = e.target.value; // Update penColor when the user selects a new color
+  if (eraserVisible) {
+    eraserVisible = false; // Turn off eraser
+    eraserToggle.style.color = eraserVisible ? accentColor : inactiveColor;
+  }
+
+  if (rainbowVisible) {
+    rainbowVisible = false;
+    rainbowColorToggle.style.color = rainbowVisible
+      ? accentColor
+      : inactiveColor;
+  }
 });
 
 eraserToggle.addEventListener("click", () => {
@@ -34,8 +51,10 @@ eraserToggle.addEventListener("click", () => {
   if (eraserVisible) {
     previousPenColor = penColor; // Store current pen color
     penColor = ""; // Set pen color to empty if eraser is active
+    rainbowVisible = false;
     shadeVisible = false; // Turn off shading mode
     shadingToggle.style.color = inactiveColor; // Update shading button color
+    rainbowColorToggle.style.color = inactiveColor;
   } else {
     penColor = previousPenColor; // Restore previous pen color
   }
@@ -45,6 +64,10 @@ eraserToggle.addEventListener("click", () => {
 rainbowColorToggle.addEventListener("click", () => {
   rainbowVisible = !rainbowVisible;
   if (rainbowVisible) {
+    if (eraserVisible) {
+      eraserVisible = false; // Turn off eraser
+      eraserToggle.style.color = eraserVisible ? accentColor : inactiveColor;
+    }
     previousPenColor = penColor; // Store current pen color
   } else {
     penColor = previousPenColor; // Restore previous pen color
@@ -97,7 +120,7 @@ function setBackgroundColor(e) {
 }
 
 function clearGrid() {
-  sketchPad.innerHTML = '';
+  sketchPad.innerHTML = "";
 }
 
 function clearBtn() {
@@ -111,7 +134,9 @@ clearSketchButton.addEventListener("click", clearBtn);
 function toggleGridLinesVisibility() {
   gridLinesVisible = !gridLinesVisible;
   gridToggle.style.color = gridLinesVisible ? accentColor : inactiveColor;
-  const widthOrHeight = `${parseInt(gridWidth) / squaresPerSide - (gridLinesVisible ? 2 : 0)}px`;
+  const widthOrHeight = `${
+    parseInt(gridWidth) / squaresPerSide - (gridLinesVisible ? 2 : 0)
+  }px`;
   sketchPad.childNodes.forEach((square) => {
     square.style.border = gridLinesVisible ? "1px solid whitesmoke" : "none";
     square.style.width = square.style.height = widthOrHeight;
@@ -121,11 +146,15 @@ gridToggle.addEventListener("click", toggleGridLinesVisibility);
 
 function createGridCells() {
   const numOfSquares = squaresPerSide * squaresPerSide;
-  const widthOrHeight = `${parseInt(gridWidth) / squaresPerSide - (gridLinesVisible ? 2 : 0)}px`;
+  const widthOrHeight = `${
+    parseInt(gridWidth) / squaresPerSide - (gridLinesVisible ? 2 : 0)
+  }px`;
   for (let i = 0; i < numOfSquares; i++) {
     const gridSquare = document.createElement("div");
     gridSquare.style.width = gridSquare.style.height = widthOrHeight;
-    gridSquare.style.border = gridLinesVisible ? "1px solid whitesmoke" : "none";
+    gridSquare.style.border = gridLinesVisible
+      ? "1px solid whitesmoke"
+      : "none";
     gridSquare.addEventListener("mousedown", setBackgroundColor);
     gridSquare.addEventListener("mouseover", setBackgroundColor);
     gridSquare.addEventListener("mouseup", setBackgroundColor);
